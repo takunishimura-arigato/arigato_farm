@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Arigato Farm | Coffee & Products</title>
+    <meta
+      name="description"
+      content="Ugandan coffee for different roasting needs. We supply green coffee beans by lot with quality information available on request."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;800&family=Noto+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="grain"></div>
+    <div class="page" data-lang-root>
+      <aside class="side">
+        <div class="brand">
+          <div class="logo"><img class="logo-img" src="assets/arigato-logo.png" alt="Arigato Farm logo" /></div>
+          <div>
+            <p class="brand-eyebrow">Uganda</p>
+            <p class="brand-name">Arigato Farm</p>
+          </div>
+        </div>
+        <nav class="side-nav">
+          <a href="index.html">Home</a>
+          <a href="about.html">Arigato Way</a>
+          <a href="farm.html">The Farm</a>
+          <a href="products.html">Coffee & Products</a>
+          <a href="quality.html">Farming & Quality</a>
+          <a href="contact.html">Wholesale & Contact</a>
+        </nav>
+        <div class="lang-toggle" role="group" aria-label="Language">
+          <button type="button" data-lang-button="ja" class="is-active">JA</button>
+          <button type="button" data-lang-button="en">EN</button>
+        </div>
+        <div class="side-tags">
+          <span>Green Coffee</span>
+          <span>Roaster</span>
+          <span>Single Origin</span>
+        </div>
+        <div class="side-footer">
+          <p>Supply by Lot</p>
+          <p>Uganda Origin</p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="section coffee">
+          <div class="section-title">
+            <p class="eyebrow">Coffee & Products</p>
+            <h2>
+              <span data-lang="ja">用途に合わせて選べるウガンダ産コーヒー</span>
+              <span data-lang="en">Ugandan coffee for different roasting needs</span>
+            </h2>
+          </div>
+          <div class="photo-card">
+            <img src="assets/products.jpg" alt="Arigato Coffee products" />
+          </div>
+          <div class="story-grid">
+            <article>
+              <h3>
+                <span data-lang="ja">提供形態</span>
+                <span data-lang="en">Supply format</span>
+              </h3>
+              <p>
+                <span data-lang="ja">
+                  Arigato Farmでは、生豆（グリーンコーヒー）を中心に提供しています。
+                  ロースターやカフェの用途に合わせ、ロット単位での供給が可能です。
+                </span>
+                <span data-lang="en">
+                  We mainly supply green coffee beans from our own farm.
+                  Lots can be prepared according to the needs of roasters and coffee businesses.
+                </span>
+              </p>
+            </article>
+            <article>
+              <h3>
+                <span data-lang="ja">主な用途例</span>
+                <span data-lang="en">Typical use cases</span>
+              </h3>
+              <ul>
+                <li>
+                  <span data-lang="ja">エスプレッソ向け：力強いボディと深いコク</span>
+                  <span data-lang="en">For espresso: strong body and deep richness</span>
+                </li>
+                <li>
+                  <span data-lang="ja">ブレンド向け：ベースを支える安定した風味</span>
+                  <span data-lang="en">For blends: a stable and supportive base</span>
+                </li>
+                <li>
+                  <span data-lang="ja">シングルオリジン：ウガンダらしい個性を楽しむ</span>
+                  <span data-lang="en">For single origin: distinctive Ugandan character</span>
+                </li>
+              </ul>
+            </article>
+            <article>
+              <h3>
+                <span data-lang="ja">提供可能な品質情報（お問い合わせ後に共有）</span>
+                <span data-lang="en">Quality information available on request</span>
+              </h3>
+              <ul>
+                <li><span data-lang="ja">スクリーンサイズ</span><span data-lang="en">Screen size</span></li>
+                <li><span data-lang="ja">含水率</span><span data-lang="en">Moisture content</span></li>
+                <li><span data-lang="ja">精製方法</span><span data-lang="en">Processing method</span></li>
+                <li><span data-lang="ja">等級・ロット情報</span><span data-lang="en">Grade and lot details</span></li>
+              </ul>
+              <p class="note">
+                <span data-lang="ja">継続取引を前提に、安定した品質のコーヒーを提案します。</span>
+                <span data-lang="en">We aim to provide consistent quality for long-term partnerships.</span>
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <p>© 2026 Arigato Farm. Crafted in Uganda.</p>
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const buttons = document.querySelectorAll("[data-lang-button]");
+        const setLang = (lang) => {
+          root.setAttribute("data-lang", lang);
+          buttons.forEach((btn) => {
+            btn.classList.toggle("is-active", btn.dataset.langButton === lang);
+          });
+          try {
+            localStorage.setItem("arigato-lang", lang);
+          } catch (e) {
+            // ignore
+          }
+        };
+        const saved = (() => {
+          try {
+            return localStorage.getItem("arigato-lang");
+          } catch (e) {
+            return null;
+          }
+        })();
+        setLang(saved || "ja");
+        buttons.forEach((btn) => {
+          btn.addEventListener("click", () => setLang(btn.dataset.langButton));
+        });
+      })();
+    </script>
+  </body>
+</html>

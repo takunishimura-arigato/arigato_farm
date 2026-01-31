@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Arigato Farm | Home</title>
+    <meta
+      name="description"
+      content="Arigato Farm and Arigato Coffee official site. Sustainable farming, traceability, and community-driven production in Uganda."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;800&family=Noto+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="grain"></div>
+    <div class="page" data-lang-root>
+      <aside class="side">
+        <div class="brand">
+          <div class="logo"><img class="logo-img" src="assets/arigato-logo.png" alt="Arigato Farm logo" /></div>
+          <div>
+            <p class="brand-eyebrow">Uganda</p>
+            <p class="brand-name">Arigato Farm</p>
+          </div>
+        </div>
+        <nav class="side-nav">
+          <a href="index.html">Home</a>
+          <a href="about.html">Arigato Way</a>
+          <a href="farm.html">The Farm</a>
+          <a href="products.html">Coffee & Products</a>
+          <a href="quality.html">Farming & Quality</a>
+          <a href="contact.html">Wholesale & Contact</a>
+        </nav>
+        <div class="lang-toggle" role="group" aria-label="Language">
+          <button type="button" data-lang-button="ja" class="is-active">JA</button>
+          <button type="button" data-lang-button="en">EN</button>
+        </div>
+        <div class="side-tags">
+          <span>Single Origin</span>
+          <span>Direct Trade</span>
+          <span>Traceability</span>
+          <span>Uganda</span>
+        </div>
+        <div class="side-footer">
+          <p>Est. 2017</p>
+          <p>Kibale Highlands</p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="hero">
+          <div class="hero-text">
+            <h1>
+              <span data-lang="ja">ウガンダの大地で、感謝と誠実から生まれる<span class="nowrap">コーヒー</span></span>
+              <span data-lang="en">Coffee grown with gratitude and integrity in Uganda</span>
+            </h1>
+            <p class="lead">
+              <span data-lang="ja">
+                Arigato Farmは、ウガンダで自ら栽培・管理を行うコーヒー農園です。
+                持続可能な農業と確かな品質管理を軸に、地域とともに成長するコーヒーづくりを行っています。
+              </span>
+              <span data-lang="en">
+                Arigato Farm is a coffee farm in Uganda where we grow and manage our crops ourselves.
+                With sustainable farming and careful quality control at the core, we produce coffee that grows together with the local community.
+              </span>
+            </p>
+            <div class="hero-actions">
+              <a class="btn primary" href="contact.html">
+                <span data-lang="ja">卸のご相談はこちら</span>
+                <span data-lang="en">Wholesale Inquiry</span>
+              </a>
+              <a class="btn ghost" href="about.html">
+                <span data-lang="ja">農園について詳しく見る</span>
+                <span data-lang="en">Learn more about the farm</span>
+              </a>
+            </div>
+          </div>
+          <div class="hero-visual">
+          </div>
+        </header>
+
+        <section class="section story">
+          <div class="section-title">
+            <p class="eyebrow">Strengths</p>
+            <h2>
+              <span data-lang="ja">3つの強み</span>
+              <span data-lang="en">Our strengths</span>
+            </h2>
+          </div>
+          <div class="story-grid">
+            <article>
+              <h3>
+                <span data-lang="ja">自社農園による一貫管理</span>
+                <span data-lang="en">End-to-end management on our own farm</span>
+              </h3>
+              <p>
+                <span data-lang="ja">
+                  栽培から収穫、基礎的な加工・保管までを自らの手で管理し、品質と安定供給を両立します。
+                </span>
+                <span data-lang="en">
+                  From cultivation and harvesting to basic processing and storage, we manage the work ourselves to ensure both quality and stable supply.
+                </span>
+              </p>
+            </article>
+            <article>
+              <h3>
+                <span data-lang="ja">透明性とトレーサビリティ</span>
+                <span data-lang="en">Transparency and traceability</span>
+              </h3>
+              <p>
+                <span data-lang="ja">
+                  栽培方法、施肥、病害虫対策などの記録を残し、必要に応じてロット情報を共有します。
+                </span>
+                <span data-lang="en">
+                  We keep records of cultivation, fertilization, and pest control, and can share lot information when required.
+                </span>
+              </p>
+            </article>
+            <article>
+              <h3>
+                <span data-lang="ja">地域とともに続く農業</span>
+                <span data-lang="en">Farming that grows with the community</span>
+              </h3>
+              <p>
+                <span data-lang="ja">
+                  現地雇用の創出、衛生的で整った労働環境づくり、持続可能な土地利用に継続的に投資しています。
+                </span>
+                <span data-lang="en">
+                  We invest continuously in local employment, clean and safe working conditions, and sustainable use of the land.
+                </span>
+              </p>
+            </article>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <p>© 2026 Arigato Farm. Crafted in Uganda.</p>
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const buttons = document.querySelectorAll("[data-lang-button]");
+        const setLang = (lang) => {
+          root.setAttribute("data-lang", lang);
+          buttons.forEach((btn) => {
+            btn.classList.toggle("is-active", btn.dataset.langButton === lang);
+          });
+          try {
+            localStorage.setItem("arigato-lang", lang);
+          } catch (e) {
+            // ignore
+          }
+        };
+        const saved = (() => {
+          try {
+            return localStorage.getItem("arigato-lang");
+          } catch (e) {
+            return null;
+          }
+        })();
+        setLang(saved || "ja");
+        buttons.forEach((btn) => {
+          btn.addEventListener("click", () => setLang(btn.dataset.langButton));
+        });
+      })();
+    </script>
+  </body>
+</html>
