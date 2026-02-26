@@ -154,12 +154,9 @@
                 <span data-lang="ja">お問い合わせ種別</span>
                 <span data-lang="en">Inquiry type</span>
                 <select name="type">
-                  <option data-lang="ja">卸取引</option>
-                  <option data-lang="ja">サンプル</option>
-                  <option data-lang="ja">一般問い合わせ</option>
-                  <option data-lang="en">Wholesale</option>
-                  <option data-lang="en">Samples</option>
-                  <option data-lang="en">General</option>
+                  <option value="wholesale" data-label-ja="卸取引" data-label-en="Wholesale">卸取引</option>
+                  <option value="samples" data-label-ja="サンプル" data-label-en="Samples">サンプル</option>
+                  <option value="general" data-label-ja="一般問い合わせ" data-label-en="General">一般問い合わせ</option>
                 </select>
               </label>
               <label class="field">
@@ -217,8 +214,18 @@
       (() => {
         const root = document.documentElement;
         const buttons = document.querySelectorAll("[data-lang-button]");
+        const typeSelect = document.querySelector('select[name="type"]');
+        const syncInquiryTypeLabels = (lang) => {
+          if (!typeSelect) return;
+          typeSelect.querySelectorAll("option").forEach((option) => {
+            const key = lang === "en" ? "labelEn" : "labelJa";
+            const nextLabel = option.dataset[key];
+            if (nextLabel) option.textContent = nextLabel;
+          });
+        };
         const setLang = (lang) => {
           root.setAttribute("data-lang", lang);
+          syncInquiryTypeLabels(lang);
           buttons.forEach((btn) => {
             btn.classList.toggle("is-active", btn.dataset.langButton === lang);
           });

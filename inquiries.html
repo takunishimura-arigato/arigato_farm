@@ -237,6 +237,23 @@
         return text || "-";
       };
 
+      const normalizeInquiryType = (value) => {
+        const raw = String(value || "").trim();
+        const lower = raw.toLowerCase();
+        if (raw === "卸取引" || lower === "wholesale") return "wholesale";
+        if (raw === "サンプル" || lower === "samples") return "samples";
+        if (raw === "一般問い合わせ" || lower === "general") return "general";
+        return "";
+      };
+
+      const inquiryTypeLabel = (value, lang) => {
+        const code = normalizeInquiryType(value);
+        if (code === "wholesale") return lang === "en" ? "Wholesale" : "卸取引";
+        if (code === "samples") return lang === "en" ? "Samples" : "サンプル";
+        if (code === "general") return lang === "en" ? "General" : "一般問い合わせ";
+        return withFallback(value);
+      };
+
       const formatDate = (timestamp) => {
         if (!timestamp?.toDate) return "-";
         return new Intl.DateTimeFormat("ja-JP", {
@@ -294,7 +311,7 @@
           body.className = "inquiry-body";
           addField(body, labels.name[lang], data.name);
           addField(body, labels.email[lang], data.email);
-          addField(body, labels.type[lang], data.type);
+          addField(body, labels.type[lang], inquiryTypeLabel(data.type, lang));
           addField(body, labels.company[lang], data.company);
           addField(body, labels.volume[lang], data.volume);
           addField(body, labels.request[lang], data.request);
