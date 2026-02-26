@@ -34,6 +34,7 @@
           <a href="products.html">Coffee & Products</a>
           <a href="quality.html">Farming & Quality</a>
           <a href="contact.html">Wholesale & Contact</a>
+          <a href="inquiries.html">Inquiries</a>
         </nav>
         <div class="lang-toggle" role="group" aria-label="Language">
           <button type="button" data-lang-button="ja" class="is-active">JA</button>
@@ -43,6 +44,7 @@
           <span>Wholesale</span>
           <span>Partnership</span>
           <span>Samples</span>
+          <span>Dashboard</span>
         </div>
         <div class="side-footer">
           <p>Long-term</p>
@@ -136,7 +138,7 @@
               <span data-lang="en">Contact Form</span>
             </h2>
           </div>
-          <form class="form-card" action="#" method="post">
+          <form class="form-card" action="#" method="post" data-contact-form>
             <div class="form-grid">
               <label class="field">
                 <span data-lang="ja">お名前</span>
@@ -191,11 +193,16 @@
                 <span data-lang="en">Email us instead</span>
               </a>
             </div>
+            <p class="form-status" data-form-status aria-live="polite"></p>
           </form>
           <div class="hero-actions" style="margin-top: 20px;">
             <a class="btn primary" href="mailto:hello@arigatofarm.com">
               <span data-lang="ja">フォームの代わりにメールで相談</span>
               <span data-lang="en">Email us instead of the form</span>
+            </a>
+            <a class="btn ghost" href="inquiries.html">
+              <span data-lang="ja">問い合わせ一覧を見る</span>
+              <span data-lang="en">View inquiries</span>
             </a>
           </div>
         </section>
@@ -233,6 +240,80 @@
           btn.addEventListener("click", () => setLang(btn.dataset.langButton));
         });
       })();
+    </script>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+      import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+      import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAv5LYmfaXGHLNmFOZXe1c29Z6RjRySsTk",
+        authDomain: "arigato-farm.firebaseapp.com",
+        projectId: "arigato-farm",
+        storageBucket: "arigato-farm.firebasestorage.app",
+        messagingSenderId: "803406269412",
+        appId: "1:803406269412:web:d0ffd60c3c80a7d43495f1",
+        measurementId: "G-7ZSXZZXVS7",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getFirestore(app);
+
+      isSupported()
+        .then((supported) => {
+          if (supported) {
+            getAnalytics(app);
+          }
+        })
+        .catch((err) => {
+          console.warn("Analytics initialization skipped.", err);
+        });
+
+      const form = document.querySelector("[data-contact-form]");
+      const status = document.querySelector("[data-form-status]");
+
+      if (form && status) {
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+
+          const submitButton = form.querySelector('button[type="submit"]');
+          const lang = document.documentElement.getAttribute("data-lang") || "ja";
+          const formData = new FormData(form);
+
+          status.textContent = "";
+          status.dataset.state = "";
+          if (submitButton) submitButton.disabled = true;
+
+          try {
+            await addDoc(collection(db, "inquiries"), {
+              name: String(formData.get("name") || "").trim(),
+              email: String(formData.get("email") || "").trim(),
+              type: String(formData.get("type") || "").trim(),
+              company: String(formData.get("company") || "").trim(),
+              volume: String(formData.get("volume") || "").trim(),
+              request: String(formData.get("request") || "").trim(),
+              message: String(formData.get("message") || "").trim(),
+              createdAt: serverTimestamp(),
+            });
+
+            form.reset();
+            status.dataset.state = "success";
+            status.textContent =
+              lang === "en"
+                ? "Your inquiry has been sent successfully."
+                : "お問い合わせを送信しました。ありがとうございます。";
+          } catch (err) {
+            console.error("Failed to submit inquiry.", err);
+            status.dataset.state = "error";
+            status.textContent =
+              lang === "en"
+                ? "Failed to send. Please try again or contact us by email."
+                : "送信に失敗しました。再度お試しいただくか、メールでご連絡ください。";
+          } finally {
+            if (submitButton) submitButton.disabled = false;
+          }
+        });
+      }
     </script>
   </body>
 </html>

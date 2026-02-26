@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /inquiries/{docId} {
+      // Public form submission.
+      allow create: if true;
+
+      // Admin-only read/update/delete.
+      allow read, update, delete: if request.auth != null
+        && request.auth.uid in [
+          "REPLACE_WITH_ADMIN_UID"
+        ];
+    }
+  }
+}

@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Arigato Farm | Inquiries</title>
+    <meta
+      name="description"
+      content="Arigato Farmの問い合わせフォーム送信内容を一覧で確認するページ。"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:wght@400;600;700;800&family=Noto+Sans:wght@300;400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="grain"></div>
+    <div class="page" data-lang-root>
+      <aside class="side">
+        <div class="brand">
+          <div class="logo"><img class="logo-img" src="assets/arigato-logo.png" alt="Arigato Farm logo" /></div>
+          <div>
+            <p class="brand-eyebrow">Uganda</p>
+            <p class="brand-name">Arigato Farm</p>
+          </div>
+        </div>
+        <nav class="side-nav">
+          <a href="index.html">Home</a>
+          <a href="about.html">Arigato Way</a>
+          <a href="farm.html">The Farm</a>
+          <a href="products.html">Coffee & Products</a>
+          <a href="quality.html">Farming & Quality</a>
+          <a href="contact.html">Wholesale & Contact</a>
+          <a href="inquiries.html">Inquiries</a>
+        </nav>
+        <div class="lang-toggle" role="group" aria-label="Language">
+          <button type="button" data-lang-button="ja" class="is-active">JA</button>
+          <button type="button" data-lang-button="en">EN</button>
+        </div>
+        <div class="side-tags">
+          <span>Inquiries</span>
+          <span>Firestore</span>
+          <span>Dashboard</span>
+        </div>
+        <div class="side-footer">
+          <p>Internal View</p>
+          <p>Arigato Farm</p>
+        </div>
+      </aside>
+
+      <main class="main">
+        <section class="section">
+          <div class="section-title">
+            <p class="eyebrow">Inquiry Dashboard</p>
+            <h2>
+              <span data-lang="ja">フォーム送信一覧</span>
+              <span data-lang="en">Submitted inquiries</span>
+            </h2>
+          </div>
+
+          <div class="auth-card">
+            <div data-auth-logged-out>
+              <p class="note">
+                <span data-lang="ja">管理者ログイン後に問い合わせ一覧を表示します。</span>
+                <span data-lang="en">Sign in as admin to view inquiries.</span>
+              </p>
+              <form class="auth-form" data-login-form>
+                <label class="field">
+                  <span>Email</span>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="admin@example.com"
+                    autocomplete="username"
+                    required
+                  />
+                </label>
+                <label class="field">
+                  <span data-lang="ja">パスワード</span>
+                  <span data-lang="en">Password</span>
+                  <input
+                    type="password"
+                    name="password"
+                    autocomplete="current-password"
+                    required
+                  />
+                </label>
+                <button type="submit" class="btn primary">
+                  <span data-lang="ja">ログイン</span>
+                  <span data-lang="en">Sign in</span>
+                </button>
+              </form>
+            </div>
+
+            <div class="auth-user is-hidden" data-auth-logged-in>
+              <p class="note">
+                <span data-lang="ja">ログイン中:</span>
+                <span data-lang="en">Signed in:</span>
+                <strong data-user-email></strong>
+              </p>
+              <button type="button" class="btn ghost" data-logout>
+                <span data-lang="ja">ログアウト</span>
+                <span data-lang="en">Sign out</span>
+              </button>
+            </div>
+
+            <p class="form-status" data-auth-status aria-live="polite"></p>
+          </div>
+
+          <div class="is-hidden" data-dashboard>
+            <div class="inquiries-toolbar">
+              <button type="button" class="btn primary" data-refresh>
+                <span data-lang="ja">再読み込み</span>
+                <span data-lang="en">Reload</span>
+              </button>
+              <p class="note" data-result-count></p>
+            </div>
+
+            <p class="form-status" data-load-status aria-live="polite"></p>
+            <div class="inquiries-list" data-inquiries-list></div>
+          </div>
+        </section>
+
+        <footer class="footer">
+          <p>© 2026 Arigato Farm. Crafted in Uganda.</p>
+        </footer>
+      </main>
+    </div>
+
+    <script>
+      (() => {
+        const root = document.documentElement;
+        const buttons = document.querySelectorAll("[data-lang-button]");
+        const setLang = (lang) => {
+          root.setAttribute("data-lang", lang);
+          buttons.forEach((btn) => {
+            btn.classList.toggle("is-active", btn.dataset.langButton === lang);
+          });
+          try {
+            localStorage.setItem("arigato-lang", lang);
+          } catch (e) {
+            // ignore
+          }
+        };
+        const saved = (() => {
+          try {
+            return localStorage.getItem("arigato-lang");
+          } catch (e) {
+            return null;
+          }
+        })();
+        setLang(saved || "ja");
+        buttons.forEach((btn) => {
+          btn.addEventListener("click", () => setLang(btn.dataset.langButton));
+        });
+      })();
+    </script>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+      import {
+        getAuth,
+        setPersistence,
+        browserLocalPersistence,
+        onAuthStateChanged,
+        signInWithEmailAndPassword,
+        signOut,
+      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+      import {
+        getFirestore,
+        collection,
+        query,
+        orderBy,
+        limit,
+        getDocs,
+      } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyAv5LYmfaXGHLNmFOZXe1c29Z6RjRySsTk",
+        authDomain: "arigato-farm.firebaseapp.com",
+        projectId: "arigato-farm",
+        storageBucket: "arigato-farm.firebasestorage.app",
+        messagingSenderId: "803406269412",
+        appId: "1:803406269412:web:d0ffd60c3c80a7d43495f1",
+        measurementId: "G-7ZSXZZXVS7",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+      const dashboard = document.querySelector("[data-dashboard]");
+      const list = document.querySelector("[data-inquiries-list]");
+      const status = document.querySelector("[data-load-status]");
+      const count = document.querySelector("[data-result-count]");
+      const refreshButton = document.querySelector("[data-refresh]");
+      const authStatus = document.querySelector("[data-auth-status]");
+      const loginForm = document.querySelector("[data-login-form]");
+      const authLoggedOut = document.querySelector("[data-auth-logged-out]");
+      const authLoggedIn = document.querySelector("[data-auth-logged-in]");
+      const logoutButton = document.querySelector("[data-logout]");
+      const userEmail = document.querySelector("[data-user-email]");
+
+      const labels = {
+        name: { ja: "お名前", en: "Name" },
+        email: { ja: "メールアドレス", en: "Email" },
+        type: { ja: "お問い合わせ種別", en: "Inquiry type" },
+        company: { ja: "会社名／店舗名", en: "Company" },
+        volume: { ja: "想定使用量", en: "Expected usage" },
+        request: { ja: "ご希望内容", en: "Request type" },
+        message: { ja: "お問い合わせ内容", en: "Message" },
+      };
+
+      const currentLang = () => document.documentElement.getAttribute("data-lang") || "ja";
+      const hide = (element, shouldHide) => {
+        if (!element) return;
+        element.classList.toggle("is-hidden", shouldHide);
+      };
+
+      const setCountText = (text) => {
+        if (count) {
+          count.textContent = text;
+        }
+      };
+
+      const setAuthStatus = (state, message) => {
+        if (!authStatus) return;
+        authStatus.dataset.state = state || "";
+        authStatus.textContent = message || "";
+      };
+
+      const withFallback = (value) => {
+        if (!value) return "-";
+        const text = String(value).trim();
+        return text || "-";
+      };
+
+      const formatDate = (timestamp) => {
+        if (!timestamp?.toDate) return "-";
+        return new Intl.DateTimeFormat("ja-JP", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+        }).format(timestamp.toDate());
+      };
+
+      const addField = (container, label, value) => {
+        const row = document.createElement("div");
+        row.className = "inquiry-row";
+        const key = document.createElement("p");
+        key.className = "inquiry-key";
+        key.textContent = label;
+        const val = document.createElement("p");
+        val.className = "inquiry-value";
+        val.textContent = withFallback(value);
+        row.append(key, val);
+        container.appendChild(row);
+      };
+
+      const renderDocs = (docs) => {
+        if (!list) return;
+        list.innerHTML = "";
+        const lang = currentLang();
+
+        if (!docs.length) {
+          if (status) {
+            status.dataset.state = "success";
+            status.textContent =
+              lang === "en" ? "No inquiries found yet." : "まだ問い合わせはありません。";
+          }
+          return;
+        }
+
+        docs.forEach((entry) => {
+          const data = entry.data();
+          const card = document.createElement("article");
+          card.className = "inquiry-card";
+
+          const head = document.createElement("div");
+          head.className = "inquiry-head";
+          const id = document.createElement("p");
+          id.className = "inquiry-id";
+          id.textContent = `ID: ${entry.id}`;
+          const date = document.createElement("p");
+          date.className = "inquiry-date";
+          date.textContent = formatDate(data.createdAt);
+          head.append(id, date);
+
+          const body = document.createElement("div");
+          body.className = "inquiry-body";
+          addField(body, labels.name[lang], data.name);
+          addField(body, labels.email[lang], data.email);
+          addField(body, labels.type[lang], data.type);
+          addField(body, labels.company[lang], data.company);
+          addField(body, labels.volume[lang], data.volume);
+          addField(body, labels.request[lang], data.request);
+          addField(body, labels.message[lang], data.message);
+
+          card.append(head, body);
+          list.appendChild(card);
+        });
+      };
+
+      const loadInquiries = async () => {
+        const lang = currentLang();
+        if (!auth.currentUser) {
+          if (status) {
+            status.dataset.state = "";
+            status.textContent =
+              lang === "en" ? "Sign in first to load inquiries." : "問い合わせを表示するにはログインしてください。";
+          }
+          setCountText(lang === "en" ? "Not signed in" : "未ログイン");
+          return;
+        }
+
+        if (status) {
+          status.dataset.state = "";
+          status.textContent = lang === "en" ? "Loading..." : "読み込み中...";
+        }
+        if (refreshButton) refreshButton.disabled = true;
+
+        try {
+          const q = query(collection(db, "inquiries"), orderBy("createdAt", "desc"), limit(100));
+          const snapshot = await getDocs(q);
+          setCountText(
+            lang === "en"
+              ? `${snapshot.size} inquiries`
+              : `${snapshot.size} 件の問い合わせ`,
+          );
+          renderDocs(snapshot.docs);
+          if (snapshot.size > 0 && status) {
+            status.dataset.state = "success";
+            status.textContent = lang === "en" ? "Loaded successfully." : "読み込みが完了しました。";
+          }
+        } catch (err) {
+          console.error("Failed to load inquiries.", err);
+          if (status) {
+            status.dataset.state = "error";
+            status.textContent =
+              lang === "en"
+                ? "Failed to load inquiries. Check Firestore rules."
+                : "読み込みに失敗しました。Firestoreルールを確認してください。";
+          }
+        } finally {
+          if (refreshButton) refreshButton.disabled = false;
+        }
+      };
+
+      const authErrorMessage = (code, lang) => {
+        if (code === "auth/invalid-credential") {
+          return lang === "en" ? "Invalid email or password." : "メールアドレスまたはパスワードが正しくありません。";
+        }
+        if (code === "auth/too-many-requests") {
+          return lang === "en"
+            ? "Too many attempts. Please wait and try again."
+            : "試行回数が多すぎます。時間をおいて再試行してください。";
+        }
+        if (code === "auth/network-request-failed") {
+          return lang === "en" ? "Network error. Please try again." : "ネットワークエラーです。再試行してください。";
+        }
+        return lang === "en" ? "Sign-in failed." : "ログインに失敗しました。";
+      };
+
+      setPersistence(auth, browserLocalPersistence).catch((err) => {
+        console.warn("Auth persistence setup failed.", err);
+      });
+
+      if (loginForm) {
+        loginForm.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const lang = currentLang();
+          const formData = new FormData(loginForm);
+          const email = String(formData.get("email") || "").trim();
+          const password = String(formData.get("password") || "");
+          const submitButton = loginForm.querySelector('button[type="submit"]');
+
+          setAuthStatus("", lang === "en" ? "Signing in..." : "ログイン中...");
+          if (submitButton) submitButton.disabled = true;
+
+          try {
+            await signInWithEmailAndPassword(auth, email, password);
+            setAuthStatus("success", lang === "en" ? "Signed in." : "ログインしました。");
+            loginForm.reset();
+          } catch (err) {
+            console.error("Sign-in failed.", err);
+            setAuthStatus("error", authErrorMessage(err.code, lang));
+          } finally {
+            if (submitButton) submitButton.disabled = false;
+          }
+        });
+      }
+
+      if (logoutButton) {
+        logoutButton.addEventListener("click", async () => {
+          const lang = currentLang();
+          try {
+            await signOut(auth);
+            setAuthStatus("success", lang === "en" ? "Signed out." : "ログアウトしました。");
+          } catch (err) {
+            console.error("Sign-out failed.", err);
+            setAuthStatus("error", lang === "en" ? "Sign-out failed." : "ログアウトに失敗しました。");
+          }
+        });
+      }
+
+      onAuthStateChanged(auth, (user) => {
+        const lang = currentLang();
+        const signedIn = Boolean(user);
+        hide(authLoggedOut, signedIn);
+        hide(authLoggedIn, !signedIn);
+        hide(dashboard, !signedIn);
+
+        if (!signedIn) {
+          if (list) list.innerHTML = "";
+          if (status) {
+            status.dataset.state = "";
+            status.textContent = "";
+          }
+          setCountText(lang === "en" ? "Not signed in" : "未ログイン");
+          if (!authStatus?.textContent) {
+            setAuthStatus("", lang === "en" ? "Please sign in." : "ログインしてください。");
+          }
+          return;
+        }
+
+        if (userEmail) {
+          userEmail.textContent = user.email || user.uid;
+        }
+        setAuthStatus("success", lang === "en" ? "Authenticated." : "認証済みです。");
+        loadInquiries();
+      });
+
+      if (refreshButton) {
+        refreshButton.addEventListener("click", loadInquiries);
+      }
+
+      window.addEventListener("storage", (event) => {
+        if (event.key === "arigato-lang") {
+          const lang = currentLang();
+          if (!auth.currentUser) {
+            setCountText(lang === "en" ? "Not signed in" : "未ログイン");
+            if (!authStatus?.textContent || authStatus.dataset.state !== "error") {
+              setAuthStatus("", lang === "en" ? "Please sign in." : "ログインしてください。");
+            }
+          } else {
+            loadInquiries();
+          }
+        }
+      });
+
+      document.querySelectorAll("[data-lang-button]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const lang = currentLang();
+          if (auth.currentUser) {
+            loadInquiries();
+          } else {
+            setCountText(lang === "en" ? "Not signed in" : "未ログイン");
+            if (!authStatus?.textContent || authStatus.dataset.state !== "error") {
+              setAuthStatus("", lang === "en" ? "Please sign in." : "ログインしてください。");
+            }
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
