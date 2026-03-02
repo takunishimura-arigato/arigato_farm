@@ -138,7 +138,10 @@
               <span data-lang="en">Contact Form</span>
             </h2>
           </div>
-          <form class="form-card" action="#" method="post" data-contact-form>
+          <form id="contact-form" class="form-card" action="https://formsubmit.co/taku.nishimura@sowxp.co.jp" method="post" data-contact-form>
+            <input type="hidden" name="_subject" value="Arigato Farm: New inquiry from website form" />
+            <input type="hidden" name="_captcha" value="false" />
+            <input type="text" name="_honey" style="display: none" tabindex="-1" autocomplete="off" />
             <div class="form-grid">
               <label class="field">
                 <span data-lang="ja">お名前</span>
@@ -185,7 +188,7 @@
                 <span data-lang="ja">この内容で送信</span>
                 <span data-lang="en">Send inquiry</span>
               </button>
-              <a class="btn ghost" href="mailto:hello@arigatofarm.com">
+              <a class="btn ghost" href="mailto:taku.nishimura@sowxp.co.jp">
                 <span data-lang="ja">フォームの代わりにメールで相談</span>
                 <span data-lang="en">Email us instead</span>
               </a>
@@ -193,7 +196,7 @@
             <p class="form-status" data-form-status aria-live="polite"></p>
           </form>
           <div class="hero-actions" style="margin-top: 20px;">
-            <a class="btn primary" href="mailto:hello@arigatofarm.com">
+            <a class="btn primary" href="mailto:taku.nishimura@sowxp.co.jp">
               <span data-lang="ja">フォームの代わりにメールで相談</span>
               <span data-lang="en">Email us instead of the form</span>
             </a>
@@ -292,7 +295,7 @@
           if (submitButton) submitButton.disabled = true;
 
           try {
-            await addDoc(collection(db, "inquiries"), {
+            const payload = {
               name: String(formData.get("name") || "").trim(),
               email: String(formData.get("email") || "").trim(),
               type: String(formData.get("type") || "").trim(),
@@ -301,7 +304,21 @@
               request: String(formData.get("request") || "").trim(),
               message: String(formData.get("message") || "").trim(),
               createdAt: serverTimestamp(),
-            });
+            };
+
+            await Promise.all([
+              addDoc(collection(db, "inquiries"), payload),
+              fetch("https://formsubmit.co/ajax/taku.nishimura@sowxp.co.jp", {
+                method: "POST",
+                headers: { Accept: "application/json" },
+                body: formData,
+              }).then(async (res) => {
+                const data = await res.json().catch(() => ({}));
+                if (!res.ok || (data.success !== true && data.success !== "true")) {
+                  throw new Error("Mail notification failed.");
+                }
+              }),
+            ]);
 
             form.reset();
             status.dataset.state = "success";
