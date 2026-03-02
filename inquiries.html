@@ -19,7 +19,13 @@
   <body>
     <div class="grain"></div>
     <div class="page" data-lang-root>
-      <aside class="side">
+      <button class="mobile-nav-toggle" type="button" data-nav-toggle aria-controls="site-side" aria-expanded="false">
+        <span data-lang="ja">メニュー</span>
+        <span data-lang="en">Menu</span>
+      </button>
+      <button class="mobile-nav-overlay" type="button" data-nav-overlay hidden aria-label="Close menu"></button>
+      <aside id="site-side" class="side">
+        <button class="mobile-nav-close" type="button" data-nav-close aria-label="Close menu">×</button>
         <div class="brand">
           <div class="logo"><img class="logo-img" src="assets/arigato-logo.png" alt="Arigato Farm logo" /></div>
           <div>
@@ -134,6 +140,11 @@
       (() => {
         const root = document.documentElement;
         const buttons = document.querySelectorAll("[data-lang-button]");
+        const page = document.querySelector(".page");
+        const navToggle = document.querySelector("[data-nav-toggle]");
+        const navOverlay = document.querySelector("[data-nav-overlay]");
+        const navClose = document.querySelector("[data-nav-close]");
+        const navLinks = document.querySelectorAll(".side-nav a");
         const setLang = (lang) => {
           root.setAttribute("data-lang", lang);
           buttons.forEach((btn) => {
@@ -156,6 +167,33 @@
         buttons.forEach((btn) => {
           btn.addEventListener("click", () => setLang(btn.dataset.langButton));
         });
+
+        const isMobileView = () => window.innerWidth <= 980;
+        const setNavOpen = (open) => {
+          if (!page) return;
+          const nextOpen = isMobileView() ? open : false;
+          page.classList.toggle("is-nav-open", nextOpen);
+          if (navToggle) navToggle.setAttribute("aria-expanded", nextOpen ? "true" : "false");
+          if (navOverlay) navOverlay.hidden = !nextOpen;
+          document.body.classList.toggle("nav-lock", nextOpen);
+        };
+        const syncNavState = () => {
+          setNavOpen(false);
+        };
+
+        if (navToggle) {
+          navToggle.addEventListener("click", () => {
+            const isOpen = page && page.classList.contains("is-nav-open");
+            setNavOpen(!isOpen);
+          });
+        }
+        if (navOverlay) navOverlay.addEventListener("click", () => setNavOpen(false));
+        if (navClose) navClose.addEventListener("click", () => setNavOpen(false));
+        navLinks.forEach((link) => {
+          link.addEventListener("click", () => setNavOpen(false));
+        });
+        syncNavState();
+        window.addEventListener("resize", syncNavState);
       })();
     </script>
 
